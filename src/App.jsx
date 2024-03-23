@@ -1,53 +1,83 @@
-import { useState , useEffect } from "react"
-import { getAllCountries } from "./services/getAllCountries"
-
-const Countrie = ({name , flags}) => {
-  return (
-      <div>
-          <li>
-              <p>{name.common}</p>
-              <img src= {flags.png}></img>
-          </li>
-      </div>
-  )
-}
+import { useState, useEffect } from "react";
+import { getAllCountries } from "./services/getAllCountries";
+import { Countrie } from "./Countrie";
 
 const App = () => {
-  const [countries, setCountries] = useState([])
-  const [searched, setSearched] = useState("")
+  const [countries, setCountries] = useState([]);
+  const [countrie, setCountrie] = useState({
+    name: "",
+    flags: "",
+  });
+  const [searched, setSearched] = useState("");
+  const [find, setFind] = useState(null);
 
   useEffect(() => {
-    console.log("Cargó")
+    console.log("oka");
     setTimeout(() => {
       getAllCountries().then((countries) => {
-        setCountries(countries)
-      })
-    }, 2000)
-  }, [])
+        setCountries(countries);
+      });
+    }, 1000);
+  }, []);
 
   const handleChange = (event) => {
-    setSearched(event.target.value)
-  }
+    setSearched(event.target.value);
+  };
 
   const handleSubmit = (event) => {
-    event.preventDefault()
-    countries.map((countrie) => {
-      if(searched === countrie.name.common){
-        console.log(countrie)
-        return <Countrie name={countrie.name} flags={countrie.flags}/>
+    event.preventDefault();
+    setFind(false);
+    setCountrie(
+      {
+        name: " ",
+        flags: " ",
       }
-    })
+    );
+    const s = searched
+    setSearched("")
+    countries.map((c) => {
+        if (s === c.name.common) {
+        //console.log(countrie);
+        setFind(true);
+        setCountrie(
+          {
+            name: c.name,
+            flags: c.flags,
+          }
+        );
+        //
+      }
+    });
+    console.log(countrie)
+
+  };
+
+  const renderView = () => {
+    if(find === null){
+      return <div></div>
+    }
+    else if(find === true){
+      return <Countrie name={countrie.name} flags={countrie.flags} />
+    }
+    else{
+      return <p>No se encontro</p>
+    }
   }
 
   return (
     <div>
-      Paises
-      <form onSubmit={handleSubmit}>
-          <input type="text" onChange={handleChange} value={searched}></input>
-          <button>Buscar</button>
-      </form>
-
+      {countries.length < 2
+        ? <p>Cargando paises...</p>
+        : <div>
+          Paises
+          <form onSubmit={handleSubmit}>
+            <input id = "buscador" type="text" onChange={handleChange} value={searched} autoComplete="on"></input>
+            <button>Buscar</button>
+          </form>
+          <br></br>
+          {renderView()}
+        </div>}
     </div>
-  )
-}
-export default App
+  );
+};
+export default App;
